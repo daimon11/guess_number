@@ -6,17 +6,40 @@ import PropTypes from 'prop-types';
 export class ClassComponent extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       result: 'Результат',
       userNumber: '',
-      randomNumber:
-        Math.floor(Math.random() * (this.props.max - this.props.min) + this.props.min),
+      randomNumber: Math.floor(Math.random() *
+        (this.props.max - this.props.min) +
+        this.props.min),
+      count: 0,
     };
   }
 
+  updateRandomNumber = () => {
+    const newRandomNumber = Math.floor(Math.random() *
+      (this.props.max - this.props.min) +
+      this.props.min);
+    this.setState({
+      randomNumber: newRandomNumber,
+      result: 'Результат',
+    });
+  };
+
+  handleStartOver = () => {
+    this.setState(state => {
+      delete this.state.btn;
+    });
+  };
+
   handleSubmit = (e) => {
     e.preventDefault();
+
+
+    this.setState(state => ({
+      count: this.state.count + 1,
+    }));
+
     this.setState(state => {
       if (!state.userNumber) {
         return {
@@ -37,9 +60,15 @@ export class ClassComponent extends React.Component {
       }
 
       return {
-        result: `Вы угадали, загаданное число равно ${state.userNumber}`,
+        result: `Вы угадали, загаданное число равно ${state.userNumber}, число попыток ${state.count}`,
+        btn: `Сыграть ещё`,
+        count: 0,
       };
     });
+
+    this.setState(state => ({
+      userNumber: '',
+    }));
   };
 
   handleChange = (e) => {
@@ -49,6 +78,10 @@ export class ClassComponent extends React.Component {
   };
 
   render() {
+    console.log(this.state.randomNumber);
+
+    let benStartOver = this.state.btn;
+
     return (
       <div className={style.game}>
         <p className={style.result}>{this.state.result}</p>
@@ -70,6 +103,13 @@ export class ClassComponent extends React.Component {
           <button
             className={style.btn}
           >Угадать</button>
+          {benStartOver &&
+            <button onClick={() => {
+              this.handleStartOver();
+              this.updateRandomNumber();
+            }} className={style.btn}
+            >{benStartOver}</button>
+          }
         </form>
       </div>
     );
